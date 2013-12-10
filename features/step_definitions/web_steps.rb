@@ -41,12 +41,31 @@ Given /^the blog is set up$/ do
                 :profile_id => 1,
                 :name => 'admin',
                 :state => 'active'})
+
+  User.create!({:login => 'nonadmin',
+                :password => 'bbbbbbbb',
+                :email => 'non@snow.com',
+                :profile_id => 2,
+                :name => 'nonadmin',
+                :state => 'active'})
 end
 
 And /^I am logged into the admin panel$/ do
   visit '/accounts/login'
   fill_in 'user_login', :with => 'admin'
   fill_in 'user_password', :with => 'aaaaaaaa'
+  click_button 'Login'
+  if page.respond_to? :should
+    page.should have_content('Login successful')
+  else
+    assert page.has_content?('Login successful')
+  end
+end
+
+And /^I am logged in as a nonadmin$/ do
+  visit '/accounts/login'
+  fill_in 'user_login', :with => 'nonadmin'
+  fill_in 'user_password', :with => 'bbbbbbbb'
   click_button 'Login'
   if page.respond_to? :should
     page.should have_content('Login successful')
@@ -162,6 +181,17 @@ Then /^(?:|I )should not see \/([^\/]*)\/$/ do |regexp|
   end
 end
 
+
+
+Then /I should not see the merge articles feature/ do
+ 
+  puts "debugging"
+  puts page.body #todo - ditch debug trace
+
+  assert !page.has_selector?("merge_articles") #todo - 
+
+end
+
 Then /^the "([^"]*)" field(?: within (.*))? should contain "([^"]*)"$/ do |field, parent, value|
   with_scope(parent) do
     field = find_field(field)
@@ -253,6 +283,9 @@ end
  
 Then /^(?:|I )should be on (.+)$/ do |page_name|
   current_path = URI.parse(current_url).path
+
+puts "Then /^(?:|I )should be on "+page_name+":"+current_path
+
   if current_path.respond_to? :should
     current_path.should == path_to(page_name)
   else
