@@ -185,10 +185,19 @@ end
 
 Then /I should not see the merge articles feature/ do
  
-  puts "debugging"
+  puts "debugging not see merged article feature"
   puts page.body #todo - ditch debug trace
 
-  assert !page.has_selector?("merge_articles") #todo - 
+  assert !page.has_selector?("#merge_with") #the element with id="merge_with"
+
+end
+
+Then /I should see the merge articles feature/ do
+ 
+  puts "debugging see merged article feature"
+  puts page.body #todo - ditch debug trace
+
+  assert page.has_selector?("#merge_with") 
 
 end
 
