@@ -28,6 +28,9 @@ class Admin::ContentController < Admin::BaseController
   end
 
   def edit
+
+    debugger
+
     @article = Article.find(params[:id])
     unless @article.access_by? current_user
       redirect_to :action => 'index'
@@ -113,6 +116,15 @@ class Admin::ContentController < Admin::BaseController
     render :text => nil
   end
 
+  def merge
+    debugger
+    #TODO - perform merge
+
+
+    
+    redirect_to :action => 'edit', :id => params[:id], alert: "Watch it, mister!"
+  end
+
   protected
 
   def get_fresh_or_existing_draft_for_article
@@ -140,10 +152,18 @@ class Admin::ContentController < Admin::BaseController
   def real_action_for(action); { 'add' => :<<, 'remove' => :delete}[action]; end
 
   def new_or_edit
+
+    debugger
+    puts "In new_or_edit:"+params.inspect
+
+
+
     id = params[:id]
     id = params[:article][:id] if params[:article] && params[:article][:id]
     @article = Article.get_or_build_article(id)
     @article.text_filter = current_user.text_filter if current_user.simple_editor?
+
+  
 
     @post_types = PostType.find(:all)
     if request.post?
@@ -163,6 +183,9 @@ class Admin::ContentController < Admin::BaseController
     @article.published_at = DateTime.strptime(params[:article][:published_at], "%B %e, %Y %I:%M %p GMT%z").utc rescue Time.parse(params[:article][:published_at]).utc rescue nil
 
     if request.post?
+
+      debugger
+
       set_article_author
       save_attachments
       
@@ -180,15 +203,28 @@ class Admin::ContentController < Admin::BaseController
     @images = Resource.images_by_created_at.page(params[:page]).per(10)
     @resources = Resource.without_images_by_filename
     @macros = TextFilter.macro_filters
+
+    
+
     render 'new'
+  end
+
+  def merge_requested
+    return false #TODO - check params[:merge_into]
   end
 
   def set_the_flash
     case params[:action]
     when 'new'
       flash[:notice] = _('Article was successfully created')
-    when 'edit'
-      flash[:notice] = _('Article was successfully updated.')
+    when 'edit' 
+      if merge_requested
+         action_taken = "merged"
+      else
+	 action_taken = "updated"
+      end
+      flash[:notice] = _('Article was successfully '+action_taken+'.')
+      
     else
       raise "I don't know how to tidy up action: #{params[:action]}"
     end
