@@ -183,12 +183,26 @@ end
 
 
 
+Then /I should see the merge articles feature/ do
+ 
+  debugger
+  #examine page.body
+
+  target_selector = "#merge_with_id"
+
+  assert page.has_selector?(target_selector) , "failed to find css selector with class "+target_selector
+
+end
+
+
 Then /I should not see the merge articles feature/ do
  
-  puts "debugging"
-  puts page.body #todo - ditch debug trace
+  debugger
+  #examine page.body
 
-  assert !page.has_selector?("merge_articles") #todo - 
+  target_selector = "#merge_with_id"
+
+  assert !page.has_selector?(target_selector) , "A non-admin user cannot merge articles - improperly found css selector with class "+target_selector+" as a non-admin user"
 
 end
 
