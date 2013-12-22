@@ -1,13 +1,13 @@
-<%- merge_into = @article.id -%>
 <h2>Merge Articles</h2>
 <div>
-<p>Article ID <%= text_field 'merge_with', :id => 'merge_with', :class => 'span1', :style => ' width: 20%' %></p>
+<% form_tag merge do %>
+  <p>
+    Article ID: <%= text_field_tag :merge_with, params[:merge_with] %>
+  </p>
+  <p>
+    <%= submit_tag "Merge", :name => nil %>
+  </p>
+<% end %>
 
-
-<p><%= button_to _("Merge"), {:controller => 'admin/content', :action => 'merge', :merge_with => :post} , :class => 'btn info' %>
-
-
-
-
-</p>
 </div>
+
