@@ -1,13 +1,11 @@
-<h2>Merge Articles</h2>
 <div>
-<% form_tag merge do %>
+  <h2>Merge Articles</h2>
   <p>
     Article ID: <%= text_field_tag :merge_with, params[:merge_with] %>
   </p>
   <p>
     <%= submit_tag "Merge", :name => nil %>
   </p>
-<% end %>
 
 </div>
 

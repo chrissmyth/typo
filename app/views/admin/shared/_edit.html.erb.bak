@@ -7,6 +7,6 @@
 
 <% end %>
 
-<% form_tag('/admin/content/merge', :method => 'post') do %>
-   <%= render :partial => "merge" %>
-<% end %>
+ <%= render :partial => "merge" %>
+
+
