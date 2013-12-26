@@ -1,4 +1,5 @@
 <% className = form_action.delete(:class) %>
+<% merge_into_id = @article.id %>
 <%= form_tag(form_action, :id => "#{form_type}_form", :enctype => "multipart/form-data", :class => className) do %>
 
  
@@ -7,6 +8,14 @@
 
 <% end %>
 
-<% form_tag('/admin/content/merge', :method => 'post') do %>
-   <%= render :partial => "merge" %>
+
+<%= form_for @article, url: {controller: "content", action: "merge", id: @article.id}, html: {:method => 'post', class: "nifty_form"} do |f| %>
+  <h2>Merge Articles</h2>
+  <p>
+    Article ID: <%= text_field_tag :merge_with, params[:merge_with] %>
+  </p>
+  <p>
+  <%= f.submit "Merge" %>
 <% end %>
+
+
