@@ -20,3 +20,24 @@ When /^I start editing an article$/ do
   click_link("Foobar")
   page.should have_xpath('//*', :text => "Lorem Ipsum")
 end
+
+Given /^there is an article titled "(.*?)" with text of "(.*?)"$/ do |arg1, arg2|
+  pending # express the regexp above with the code you wish you had
+end
+
+When /^I merge the article titled "(.*?)" with the article titled "(.*?)"$/ do |arg1, arg2|
+  pending # express the regexp above with the code you wish you had
+end
+
+Then /^the article titled "(.*?)" must still exist$/ do |arg1|
+  pending # express the regexp above with the code you wish you had
+end
+
+Then /^the article titled "(.*?)" must not exist$/ do |arg1|
+  pending # express the regexp above with the code you wish you had
+end
+
+Then /^the article titled "(.*?)" must have text of "(.*?)"$/ do |arg1, arg2|
+  pending # express the regexp above with the code you wish you had
+end
+

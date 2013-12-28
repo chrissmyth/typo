@@ -16,6 +16,15 @@ Feature: Merge Articles
     Given I am logged in as an admin
     When I start editing an article
     Then I should see the merge articles feature
+
+  Scenario: When articles are merged, the merged article should contain the text of both previous articles. 
+    Given I am logged in as an admin
+      And there is an article titled "Article 1" with text of "Text 1"
+      And there is an article titled "Article 2" with text of "Text 2"
+    When I merge the article titled "Article 1" with the article titled "Article 2"
+    Then the article titled "Article 1" must still exist
+      And the article titled "Article 2" must not exist
+      And the article titled "Article 1" must have text of "Text 1 Text 2"
 	
 
 
