@@ -29,7 +29,7 @@ class Admin::ContentController < Admin::BaseController
 
   def edit
 
-    debugger
+    debugger if @@debugger_on
 
     @article = Article.find(params[:id])
     unless @article.access_by? current_user
@@ -117,7 +117,7 @@ class Admin::ContentController < Admin::BaseController
   end
 
   def merge
-    debugger
+    debugger if @@debugger_on
     #TODO - perform merge
 
 
@@ -153,8 +153,8 @@ class Admin::ContentController < Admin::BaseController
 
   def new_or_edit
 
-    debugger
-    puts "In new_or_edit:"+params.inspect
+    
+    #puts "In new_or_edit:"+params.inspect
 
 
 
@@ -183,8 +183,6 @@ class Admin::ContentController < Admin::BaseController
     @article.published_at = DateTime.strptime(params[:article][:published_at], "%B %e, %Y %I:%M %p GMT%z").utc rescue Time.parse(params[:article][:published_at]).utc rescue nil
 
     if request.post?
-
-      debugger
 
       set_article_author
       save_attachments

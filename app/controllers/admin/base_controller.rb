@@ -1,4 +1,9 @@
 class Admin::BaseController < ApplicationController
+
+  @@debugger_on = false
+  
+  debugger if @@debugger_on
+
   cattr_accessor :look_for_migrations
   @@look_for_migrations = true
   layout 'administration'
