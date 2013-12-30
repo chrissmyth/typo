@@ -29,7 +29,7 @@ class Admin::ContentController < Admin::BaseController
 
   def edit
 
-    debugger if @@debugger_on
+    #debugger if @@debugger_on
 
     @article = Article.find(params[:id])
     unless @article.access_by? current_user
@@ -122,7 +122,7 @@ class Admin::ContentController < Admin::BaseController
 
 
     
-    redirect_to :action => 'edit', :id => params[:id], alert: "Watch it, mister!"
+    redirect_to :action => 'edit', :id => params[:id]
   end
 
   protected

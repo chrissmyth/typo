@@ -1,7 +1,10 @@
  require 'spec_helper'
+require 'ruby-debug'
 
 describe Admin::ContentController do
   render_views
+
+  #@@debugger_on = true
 
   # Like it's a shared, need call everywhere
   shared_examples_for 'index action' do
@@ -480,6 +483,33 @@ describe Admin::ContentController do
     it_should_behave_like 'new action'
     it_should_behave_like 'destroy action'
     it_should_behave_like 'autosave action'
+
+    describe 'merge action' do
+
+      before :each do
+
+        debugger #if @@debugger_on
+
+        @article1 = Factory(:article, :body => 'Text 1')
+        @article2 = Factory(:article, :body => 'Text 2')
+        @id1 = @article1.id
+        @id2 = @article2.id
+      end
+
+      it 'should merge article' do
+        debugger #if @@debugger_on
+        get :merge, 'id' => @id1, 'merge_with' => @id2
+        
+        debugger #if @@debugger_on
+
+        assert_response :redirect, :action => 'edit', :id => @id1
+
+        article1 = @article1.reload
+        article1.body.should == "Text 1 Text 2"
+
+        Article.should_not be_exists({:id => @id2})
+      end
+    end
 
     describe 'edit action' do
 

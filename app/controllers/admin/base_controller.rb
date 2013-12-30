@@ -1,8 +1,8 @@
 class Admin::BaseController < ApplicationController
 
-  @@debugger_on = false
+  @@debugger_on = true
   
-  debugger if @@debugger_on
+  #debugger if @@debugger_on
 
   cattr_accessor :look_for_migrations
   @@look_for_migrations = true
