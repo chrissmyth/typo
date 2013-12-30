@@ -15,13 +15,12 @@ When /^I start editing an article$/ do
   page.should have_xpath('//*', :text => "Lorem Ipsum")
 end
 
-Given /^there is an article titled "(.*?)" with text of "(.*?)"$/ do |arg1, arg2|
+Given /^there is an article titled "(.*?)" with body of "(.*?)"$/ do |arg1, arg2|
   create_article arg1, arg2
 end
 
 When /^I merge the article titled "(.*?)" with the article titled "(.*?)"$/ do |arg1, arg2|
-  debugger
-
+  
   id_merge_into = Article.where(:title => arg1).first.id
   id_merge_with = Article.where(:title => arg2).first.id
 
@@ -42,22 +41,27 @@ When /^I merge the article titled "(.*?)" with the article titled "(.*?)"$/ do |
 end
 
 Then /^the article titled "(.*?)" must still exist$/ do |arg1|
-  pending # express the regexp above with the code you wish you had
+  assert Article.where(:title => arg1).first
 end
 
 Then /^the article titled "(.*?)" must not exist$/ do |arg1|
-  pending # express the regexp above with the code you wish you had
+  assert !Article.where(:title => arg1).first
 end
 
-Then /^the article titled "(.*?)" must have text of "(.*?)"$/ do |arg1, arg2|
-  pending # express the regexp above with the code you wish you had
+Then /^the article titled "(.*?)" must have body of "(.*?)"$/ do |arg1, arg2|
+  
+  article = Article.where(:title => arg1).first
+  article.should be_instance_of(Article)
+  
+  body = article.body
+  body.should eql(arg2) #TODO consider use of YAML::dump(article) in error message
 end
 
 
-def create_article(title, text)
+def create_article(title, body)
   visit '/admin/content/new'
   fill_in("article_title", :with => title) 
-  fill_in("article__body_and_extended_editor", :with => text)
+  fill_in("article__body_and_extended_editor", :with => body)
   click_button("Publish")
   current_path = URI.parse(current_url).path
   current_path.should == "/admin/content"
