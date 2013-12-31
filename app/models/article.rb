@@ -416,6 +416,17 @@ class Article < Content
     user.admin? || user_id == user.id
   end
 
+  def merge(merge_with)
+    debugger
+    article_merge_with = Article.find(merge_with)
+    Article.transaction do
+      self.body = self.body+" "+article_merge_with.body
+      #TODO - move comments
+      self.save!
+      article_merge_with.destroy
+    end
+  end
+
   protected
 
   def set_published_at

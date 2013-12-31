@@ -118,11 +118,13 @@ class Admin::ContentController < Admin::BaseController
 
   def merge
     debugger if @@debugger_on
-    #TODO - perform merge
-
-
-    
-    redirect_to :action => 'edit', :id => params[:id]
+    #TODO - defensive edits for merge
+    @article = Article.find(params[:id])
+    if @article.merge(params[:merge_with]) 
+      set_the_flash
+      redirect_to :action => 'edit', :id => params[:id]
+      return
+    end  
   end
 
   protected
@@ -207,21 +209,18 @@ class Admin::ContentController < Admin::BaseController
     render 'new'
   end
 
-  def merge_requested
-    return false #TODO - check params[:merge_into]
+  def merge_requested?
+    defined?(params[:merge_into])
   end
 
   def set_the_flash
     case params[:action]
     when 'new'
       flash[:notice] = _('Article was successfully created')
+    when 'merge'
+      flash[:notice] = _('Article was successfully merged')    
     when 'edit' 
-      if merge_requested
-         action_taken = "merged"
-      else
-	 action_taken = "updated"
-      end
-      flash[:notice] = _('Article was successfully '+action_taken+'.')
+      flash[:notice] = _('Article was successfully edited')
       
     else
       raise "I don't know how to tidy up action: #{params[:action]}"
