@@ -421,13 +421,20 @@ class Article < Content
     article_merge_with = Article.find(merge_with)
     Article.transaction do
       self.body = self.body+" "+article_merge_with.body
-      #TODO - move comments
+      merge_comments(article_merge_with)
       self.save!
       article_merge_with.destroy
     end
   end
 
   protected
+
+  def merge_comments(merge_article)
+    debugger
+    merge_article.comments.each do |comment|
+      self.comments.add(comment)
+    end
+  end
 
   def set_published_at
     if self.published and self[:published_at].nil?
