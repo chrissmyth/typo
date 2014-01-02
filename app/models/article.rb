@@ -432,7 +432,8 @@ class Article < Content
   def merge_comments(merge_article)
     debugger
     merge_article.comments.each do |comment|
-      self.comments.add(comment)
+      myComment = {:body => comment.body, :author => comment.author, :email => comment.email, :url => comment.url}
+      add_comment(myComment)
     end
   end
 
