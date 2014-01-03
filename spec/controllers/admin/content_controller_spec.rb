@@ -489,14 +489,19 @@ describe Admin::ContentController do
       before :each do
 
         debugger #if @@debugger_on
-
+        myComment = {:body => 'comment 1 on article 1', :author => 'fred', :email => 'fred@home', :url => 'fred.com'}
         @article1 = Factory(:article, :body => 'Text 1')
+        @article1.add_comment(myComment)
+        @article1.save!
         @article2 = Factory(:article, :body => 'Text 2')
+        myComment = {:body => 'comment 1 on article 2', :author => 'bill', :email => 'bill@home', :url => 'bill.com'}
+        @article2.add_comment(myComment)
+        @article2.save!
         @id1 = @article1.id
         @id2 = @article2.id
       end
 
-      it 'should merge article' do
+      it 'should merge article bodies' do
         debugger #if @@debugger_on
         get :merge, 'id' => @id1, 'merge_with' => @id2
         
@@ -508,6 +513,60 @@ describe Admin::ContentController do
         article1.body.should == "Text 1 Text 2"
 
         Article.should_not be_exists({:id => @id2})
+      end
+
+      it 'should transfer merge_with comments onto retained article' do
+        debugger #if @@debugger_on
+        get :merge, 'id' => @id1, 'merge_with' => @id2
+        
+        debugger #if @@debugger_on
+        article1 = @article1.reload
+        article1.comments.size.should == 2
+
+      end
+
+      it 'should deny merge into a non_existent article' do
+        debugger #if @@debugger_on
+        non_existent_id = 999
+        Article.should_not be_exists({:id => non_existent_id})
+        get :merge, 'id' => non_existent_id, 'merge_with' => @id2
+        
+        debugger #if @@debugger_on
+        Article.should be_exists({:id => @id1})
+        Article.should be_exists({:id => @id2})
+
+      end
+
+      it 'should deny merge_with a non_existent article' do
+        debugger #if @@debugger_on
+        non_existent_id = 999
+        Article.should_not be_exists({:id => non_existent_id})
+        get :merge, 'id' => @id1, 'merge_with' => non_existent_id
+        
+        debugger #if @@debugger_on
+        Article.should be_exists({:id => @id1})
+        Article.should be_exists({:id => @id2})
+
+      end
+
+      it 'should deny merge_with itself' do
+        debugger #if @@debugger_on
+        get :merge, 'id' => @id1, 'merge_with' => @id1
+        
+        debugger #if @@debugger_on
+        Article.should be_exists({:id => @id1})
+        Article.should be_exists({:id => @id2})
+
+      end
+
+      it 'should deny merge if no merge_with is given' do
+        debugger #if @@debugger_on
+        get :merge, 'id' => @id1
+        
+        debugger #if @@debugger_on
+        Article.should be_exists({:id => @id1})
+        Article.should be_exists({:id => @id2})
+
       end
     end
 
@@ -664,6 +723,18 @@ describe Admin::ContentController do
         response.should render_template('new')
         assigns(:article).should_not be_nil
         assigns(:article).should be_valid
+      end
+
+      it 'should deny merge by a non-admin' do
+        @article1 = Factory(:article, :body => 'Text 1')
+        @article2 = Factory(:article, :body => 'Text 2')
+        @id1 = @article1.id
+        @id2 = @article2.id
+        get :merge, 'id' => @id1, 'merge_with' => @id2
+        
+        debugger #if @@debugger_on
+        Article.should be_exists({:id => @id1})
+        Article.should be_exists({:id => @id2})
       end
 
       it 'should update article by edit action' do

@@ -418,6 +418,10 @@ class Article < Content
 
   def merge(merge_with)
     debugger
+
+self.errors.add_to_base("Sorry, merging is off today" )
+return false
+
     article_merge_with = Article.find(merge_with)
     Article.transaction do
       self.body = self.body+" "+article_merge_with.body

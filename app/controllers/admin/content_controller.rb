@@ -122,9 +122,12 @@ class Admin::ContentController < Admin::BaseController
     @article = Article.find(params[:id])
     if @article.merge(params[:merge_with]) 
       set_the_flash
-      redirect_to :action => 'edit', :id => params[:id]
-      return
-    end  
+      redirect_to :action => 'edit', :id => params[:id] 
+    end 
+     
+    flash[:notice] = _('Error: Unable to merge this article!')
+    flash[:error] = _('The following errors occurred: '+@article.errors.full_messages.join("', '"))
+    redirect_to :action => 'edit', :id => params[:id] 
   end
 
   protected
