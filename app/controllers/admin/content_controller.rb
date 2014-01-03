@@ -118,15 +118,18 @@ class Admin::ContentController < Admin::BaseController
 
   def merge
     debugger if @@debugger_on
-    #TODO - defensive edits for merge
+
     @article = Article.find(params[:id])
-    if @article.merge(params[:merge_with]) 
+    @article.errors.add_to_base("Only an admin user may perform merges") if !current_user.admin?
+    
+    if !@article.errors.any? and @article.merge(params[:merge_with]) 
       set_the_flash
       redirect_to :action => 'edit', :id => params[:id] 
+      return
     end 
      
     flash[:notice] = _('Error: Unable to merge this article!')
-    flash[:error] = _('The following errors occurred: '+@article.errors.full_messages.join("', '"))
+    flash[:error] = _(@article.errors.full_messages.join("', '"))
     redirect_to :action => 'edit', :id => params[:id] 
   end
 

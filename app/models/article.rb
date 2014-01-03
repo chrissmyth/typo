@@ -419,8 +419,10 @@ class Article < Content
   def merge(merge_with)
     debugger
 
-self.errors.add_to_base("Sorry, merging is off today" )
-return false
+    validate_merge_request(merge_with)
+
+#self.errors.add_to_base("Sorry, merging is off today" )
+    return false if errors.any?
 
     article_merge_with = Article.find(merge_with)
     Article.transaction do
@@ -432,6 +434,24 @@ return false
   end
 
   protected
+
+  def validate_merge_request(merge_with)
+    errors.add_to_base("Please supply an Article_ID to merge with") if merge_with.blank?
+    return if errors.any?
+    errors.add_to_base("Please supply a positive integer for the Article_ID to merge with") unless /^[+]?[1-9]([0-9]*)?$/ === merge_with
+    return if errors.any?
+
+debugger
+    self.errors.add_to_base("Unable to merge that Article_ID with itself") unless merge_with.to_i != self.id
+    return if errors.any?
+
+    begin
+      Article.find(merge_with)
+    rescue
+      self.errors.add_to_base("There is no article with that Article_ID")
+      return
+    end
+  end
 
   def merge_comments(merge_article)
     debugger
