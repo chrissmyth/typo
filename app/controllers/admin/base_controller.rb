@@ -1,6 +1,6 @@
 class Admin::BaseController < ApplicationController
 
-  @@debugger_on = true
+  @@debugger_on = false
   
   #debugger if @@debugger_on
 

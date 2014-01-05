@@ -4,8 +4,6 @@ require 'ruby-debug'
 describe Admin::ContentController do
   render_views
 
-  #@@debugger_on = true
-
   # Like it's a shared, need call everywhere
   shared_examples_for 'index action' do
 
@@ -487,8 +485,6 @@ describe Admin::ContentController do
     describe 'merge action' do
 
       before :each do
-
-        debugger #if @@debugger_on
         myComment = {:body => 'comment 1 on article 1', :author => 'fred', :email => 'fred@home', :url => 'fred.com'}
         @article1 = Factory(:article, :body => 'Text 1')
         @article1.add_comment(myComment)
@@ -497,16 +493,12 @@ describe Admin::ContentController do
         myComment = {:body => 'comment 1 on article 2', :author => 'bill', :email => 'bill@home', :url => 'bill.com'}
         @article2.add_comment(myComment)
         @article2.save!
-        @id1 = @article1.id
-        @id2 = @article2.id
+        @id1 = @article1.id.to_s
+        @id2 = @article2.id.to_s
       end
 
       it 'should merge article bodies' do
-        debugger #if @@debugger_on
-        get :merge, 'id' => @id1, 'merge_with' => @id2
-        
-        debugger #if @@debugger_on
-
+        post :merge, 'id' => @id1, 'merge_with' => @id2
         assert_response :redirect, :action => 'edit', :id => @id1
 
         article1 = @article1.reload
@@ -516,57 +508,46 @@ describe Admin::ContentController do
       end
 
       it 'should transfer merge_with comments onto retained article' do
-        debugger #if @@debugger_on
-        get :merge, 'id' => @id1, 'merge_with' => @id2
         
-        debugger #if @@debugger_on
+        post :merge, 'id' => @id1, 'merge_with' => @id2
+        
         article1 = @article1.reload
         article1.comments.size.should == 2
 
       end
 
       it 'should deny merge into a non_existent article' do
-        debugger #if @@debugger_on
-        non_existent_id = 999
+        non_existent_id = 999.to_s
         Article.should_not be_exists({:id => non_existent_id})
-        get :merge, 'id' => non_existent_id, 'merge_with' => @id2
+        expect {post :merge, 'id' => non_existent_id, 'merge_with' => @id2}.to raise_error ActiveRecord::RecordNotFound
         
-        debugger #if @@debugger_on
         Article.should be_exists({:id => @id1})
         Article.should be_exists({:id => @id2})
 
       end
 
       it 'should deny merge_with a non_existent article' do
-        debugger #if @@debugger_on
-        non_existent_id = 999
+        non_existent_id = 999.to_s
         Article.should_not be_exists({:id => non_existent_id})
-        get :merge, 'id' => @id1, 'merge_with' => non_existent_id
-        
-        debugger #if @@debugger_on
+        post :merge, 'id' => @id1, 'merge_with' => non_existent_id
+        flash[:error].should include("There is no article with that Article_ID")
         Article.should be_exists({:id => @id1})
         Article.should be_exists({:id => @id2})
-
       end
 
       it 'should deny merge_with itself' do
-        debugger #if @@debugger_on
-        get :merge, 'id' => @id1, 'merge_with' => @id1
-        
-        debugger #if @@debugger_on
+        post :merge, 'id' => @id1, 'merge_with' => @id1
+        debugger
+        flash[:error].should include("Unable to merge that Article_ID with itself")
         Article.should be_exists({:id => @id1})
         Article.should be_exists({:id => @id2})
-
       end
 
       it 'should deny merge if no merge_with is given' do
-        debugger #if @@debugger_on
-        get :merge, 'id' => @id1
-        
-        debugger #if @@debugger_on
+        post :merge, 'id' => @id1
+        flash[:error].should include("Please supply an Article_ID to merge with")
         Article.should be_exists({:id => @id1})
         Article.should be_exists({:id => @id2})
-
       end
     end
 
@@ -730,9 +711,8 @@ describe Admin::ContentController do
         @article2 = Factory(:article, :body => 'Text 2')
         @id1 = @article1.id
         @id2 = @article2.id
-        get :merge, 'id' => @id1, 'merge_with' => @id2
-        
-        debugger #if @@debugger_on
+        post :merge, 'id' => @id1, 'merge_with' => @id2
+        flash[:error].should include("Only an admin user may perform merges")
         Article.should be_exists({:id => @id1})
         Article.should be_exists({:id => @id2})
       end

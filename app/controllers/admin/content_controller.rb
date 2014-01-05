@@ -28,9 +28,6 @@ class Admin::ContentController < Admin::BaseController
   end
 
   def edit
-
-    #debugger if @@debugger_on
-
     @article = Article.find(params[:id])
     unless @article.access_by? current_user
       redirect_to :action => 'index'
@@ -117,10 +114,8 @@ class Admin::ContentController < Admin::BaseController
   end
 
   def merge
-    debugger if @@debugger_on
-
     @article = Article.find(params[:id])
-    @article.errors.add_to_base("Only an admin user may perform merges") if !current_user.admin?
+    @article.errors.add(:base, "Only an admin user may perform merges") if !current_user.admin?
     
     if !@article.errors.any? and @article.merge(params[:merge_with]) 
       set_the_flash

@@ -417,11 +417,7 @@ class Article < Content
   end
 
   def merge(merge_with)
-    debugger
-
     validate_merge_request(merge_with)
-
-#self.errors.add_to_base("Sorry, merging is off today" )
     return false if errors.any?
 
     article_merge_with = Article.find(merge_with)
@@ -436,25 +432,22 @@ class Article < Content
   protected
 
   def validate_merge_request(merge_with)
-    errors.add_to_base("Please supply an Article_ID to merge with") if merge_with.blank?
+    errors.add(:base, "Please supply an Article_ID to merge with") if merge_with.blank?
     return if errors.any?
-    errors.add_to_base("Please supply a positive integer for the Article_ID to merge with") unless /^[+]?[1-9]([0-9]*)?$/ === merge_with
+    errors.add(:base, "Please supply a positive integer for the Article_ID to merge with") unless /^[+]?[1-9]([0-9]*)?$/ === merge_with
     return if errors.any?
-
-debugger
-    self.errors.add_to_base("Unable to merge that Article_ID with itself") unless merge_with.to_i != self.id
+    self.errors.add(:base, "Unable to merge that Article_ID with itself") unless merge_with.to_i != self.id
     return if errors.any?
 
     begin
       Article.find(merge_with)
     rescue
-      self.errors.add_to_base("There is no article with that Article_ID")
+      self.errors.add(:base, "There is no article with that Article_ID")
       return
     end
   end
 
   def merge_comments(merge_article)
-    debugger
     merge_article.comments.each do |comment|
       myComment = {:body => comment.body, :author => comment.author, :email => comment.email, :url => comment.url}
       add_comment(myComment)
